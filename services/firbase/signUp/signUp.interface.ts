@@ -1,6 +1,6 @@
 import { UserCredential } from '@firebase/auth';
 
-export interface ISignIn {
+export interface ISignUp {
   result: UserCredential | null
   error: unknown;
 }

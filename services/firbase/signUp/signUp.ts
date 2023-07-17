@@ -1,15 +1,15 @@
-import { signInWithEmailAndPassword } from '@firebase/auth';
+import { createUserWithEmailAndPassword } from '@firebase/auth';
 import { auth } from '@/configs/firebase.config';
 
-import { ISignIn } from './signIn.interface';
+import { ISignUp } from './signUp.interface';
 
 
-const signIn = async (email: string, password: string): Promise<ISignIn> => {
+const signUp = async (email: string, password: string): Promise<ISignUp> => {
   let result = null;
   let error = null;
 
   try {
-    result = await signInWithEmailAndPassword(auth, email, password);
+    result = await createUserWithEmailAndPassword(auth, email, password);
   } catch (e) {
     error = e;
   }
@@ -17,4 +17,4 @@ const signIn = async (email: string, password: string): Promise<ISignIn> => {
   return { result, error };
 };
 
-export { signIn };
+export { signUp };
