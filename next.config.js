@@ -4,7 +4,7 @@ const nextConfig = {
     return [
       {
         source: '/',
-        destination: '/vocabularies',
+        destination: '/vocabularies/my',
         permanent: true,
       },
     ]

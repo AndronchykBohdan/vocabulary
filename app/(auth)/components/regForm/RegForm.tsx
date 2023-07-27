@@ -1,4 +1,8 @@
 'use client';
+import { Loader2 } from "lucide-react"
+
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -8,12 +12,11 @@ import { useRouter } from 'next/navigation';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { signUp } from '@/services/firbase';
+import { useCreateUser } from '@/hooks/api';
 
 import { formSchema } from './regForm.const';
 import { IRegForm } from './regForm.interface';
-import Link from 'next/link';
-import { signUp } from '@/services/firbase';
-import { useEffect, useState } from 'react';
 
 const RegForm = (props: IRegForm) => {
   const { mode } = props;
@@ -27,10 +30,11 @@ const RegForm = (props: IRegForm) => {
   });
   const router = useRouter();
   const session = useSession();
+  const { mutateAsync } = useCreateUser();
 
   useEffect(() => {
     if (session.status === 'authenticated') {
-      router.push('/vocabularies');
+      router.push('/vocabularies/my');
     }
   }, [session]);
 
@@ -44,6 +48,13 @@ const RegForm = (props: IRegForm) => {
     if (mode === 'signUp') {
       const { result, error } = await signUp(newData.email, newData.password);
       if (error || !result) return;
+
+      await mutateAsync({
+        id: result.user.uid,
+        email: result.user.email || '',
+        surname: '',
+        name: '',
+      });
     }
 
     const response = await signIn('credentials', {
@@ -51,9 +62,9 @@ const RegForm = (props: IRegForm) => {
       redirect: false,
     });
 
-    if (response && response.error) return;
     setLoading(false);
-    router.push('/vocabularies');
+    if (response && response.error) return;
+    router.push('/vocabularies/my');
   };
 
   return (
@@ -89,12 +100,12 @@ const RegForm = (props: IRegForm) => {
 
         <div className="flex flex-col justify-center items-center">
           <Button
-            className="mb-4"
+            className="mb-4 min-w-[90px]"
             type="submit"
             disabled={loading}
           >
             {loading
-              ? 'Loading ...'
+              ? <Loader2 className="h-4 w-4 animate-spin" />
               : mode === 'signIn'
                 ? 'Sign In'
                 : 'Sign Up'
